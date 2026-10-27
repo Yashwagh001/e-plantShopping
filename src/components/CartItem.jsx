@@ -1,111 +1,183 @@
 
 import { useDispatch, useSelector } from "react-redux";
-import { ArrowLeft, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Minus,
+  Plus,
+  ShoppingBag,
+  Trash2,
+} from "lucide-react";
+
 import { removeItem, updateQuantity } from "../features/CartSlice";
 
 export default function CartItem({ onContinueShopping }) {
   const dispatch = useDispatch();
+
   const items = useSelector((state) => state.cart.items);
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalItems = items.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+
   const subtotal = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
     0
   );
 
+  function handleIncrement(item) {
+    dispatch(
+      updateQuantity({
+        id: item.id,
+        quantity: item.quantity + 1,
+      })
+    );
+  }
+
+  function handleDecrement(item) {
+    if (item.quantity > 1) {
+      dispatch(
+        updateQuantity({
+          id: item.id,
+          quantity: item.quantity - 1,
+        })
+      );
+    } else {
+      dispatch(removeItem(item.id));
+    }
+  }
+
+  function handleRemove(item) {
+    dispatch(removeItem(item.id));
+  }
+
+  function handleCheckout() {
+    alert("Thank you for choosing Paradise Nursery!");
+  }
+
   return (
-    <section className="cart-section">
+    <section className="cart-section cart-container">
       <div className="cart-heading">
         <div>
           <span className="eyebrow">YOUR SELECTION</span>
+
           <h2>Shopping Cart</h2>
-          <p>{totalItems} {totalItems === 1 ? "plant" : "plants"} in your cart</p>
+
+          <p>
+            {totalItems} {totalItems === 1 ? "plant" : "plants"} in your cart
+          </p>
         </div>
-        <button className="continue-button" onClick={onContinueShopping}>
-          <ArrowLeft size={17} /> Continue Shopping
+
+        <button
+          className="continue-button"
+          onClick={onContinueShopping}
+        >
+          <ArrowLeft size={17} />
+          Continue Shopping
         </button>
       </div>
 
       {items.length === 0 ? (
         <div className="empty-cart">
           <ShoppingBag size={48} />
+
           <h3>Your cart is waiting for some green.</h3>
-          <p>Explore our plant collection and find your new favorite.</p>
-          <button className="primary-button" onClick={onContinueShopping}>
+
+          <p>
+            Explore our plant collection and find your new favorite.
+          </p>
+
+          <button
+            className="primary-button"
+            onClick={onContinueShopping}
+          >
             Explore Plants
           </button>
         </div>
       ) : (
         <div className="cart-layout">
-          <div className="cart-items">
+          <div className="cart-list">
             {items.map((item) => (
-              <article className="cart-row" key={item.id}>
-                <img src={item.image} alt={item.name} />
-                <div className="cart-item-info">
-                  <span className="product-category">{item.category}</span>
+              <article className="cart-item" key={item.id}>
+                <img
+                  src={item.image}
+                  alt={item.name}
+                />
+
+                <div className="cart-item-details">
+                  <span className="product-category">
+                    {item.category}
+                  </span>
+
                   <h3>{item.name}</h3>
-                  <strong>₹{item.price}</strong>
-                  <div className="quantity-control">
+
+                  <p>₹{item.price} each</p>
+
+                  <div className="quantity-controls">
                     <button
                       aria-label={`Decrease ${item.name} quantity`}
-                      onClick={() =>
-                        dispatch(updateQuantity({
-                          id: item.id,
-                          quantity: item.quantity - 1,
-                        }))
-                      }
+                      onClick={() => handleDecrement(item)}
                     >
                       <Minus size={15} />
                     </button>
+
                     <span>{item.quantity}</span>
+
                     <button
                       aria-label={`Increase ${item.name} quantity`}
-                      onClick={() =>
-                        dispatch(updateQuantity({
-                          id: item.id,
-                          quantity: item.quantity + 1,
-                        }))
-                      }
+                      onClick={() => handleIncrement(item)}
                     >
                       <Plus size={15} />
                     </button>
                   </div>
                 </div>
+
                 <div className="cart-row-end">
-                  <strong>₹{item.price * item.quantity}</strong>
+                  <strong>
+                    ₹{item.price * item.quantity}
+                  </strong>
+
                   <button
                     className="remove-button"
-                    onClick={() => dispatch(removeItem(item.id))}
+                    onClick={() => handleRemove(item)}
                     aria-label={`Remove ${item.name}`}
                   >
-                    <Trash2 size={17} /> Remove
+                    <Trash2 size={17} />
+                    Remove
                   </button>
                 </div>
               </article>
             ))}
           </div>
 
-          <aside className="order-summary">
-            <h3>Order Summary</h3>
-            <div className="summary-line">
+          <aside className="cart-summary">
+            <h2>Order Summary</h2>
+
+            <div className="summary-row">
               <span>Plants ({totalItems})</span>
               <span>₹{subtotal}</span>
             </div>
-            <div className="summary-line">
+
+            <div className="summary-row">
               <span>Delivery</span>
-              <span className="free-label">FREE</span>
+              <span>FREE</span>
             </div>
-            <div className="summary-total">
+
+            <div className="summary-row summary-total">
               <span>Total</span>
               <strong>₹{subtotal}</strong>
             </div>
+
             <button
               className="checkout-button"
-              onClick={() => alert("Thank you for choosing Paradise Nursery!")}
+              onClick={handleCheckout}
             >
               Proceed to Checkout
             </button>
-            <p className="summary-note">A little more green, delivered with care.</p>
+
+            <p className="summary-note">
+              A little more green, delivered with care.
+            </p>
           </aside>
         </div>
       )}
