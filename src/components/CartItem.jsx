@@ -12,7 +12,6 @@ import { removeItem, updateQuantity } from "../features/CartSlice";
 
 export default function CartItem({ onContinueShopping }) {
   const dispatch = useDispatch();
-
   const items = useSelector((state) => state.cart.items);
 
   const totalItems = items.reduce(
@@ -21,7 +20,7 @@ export default function CartItem({ onContinueShopping }) {
   );
 
   const subtotal = items.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + item.cost * item.quantity,
     0
   );
 
@@ -60,7 +59,6 @@ export default function CartItem({ onContinueShopping }) {
       <div className="cart-heading">
         <div>
           <span className="eyebrow">YOUR SELECTION</span>
-
           <h2>Shopping Cart</h2>
 
           <p>
@@ -69,7 +67,7 @@ export default function CartItem({ onContinueShopping }) {
         </div>
 
         <button
-          className="continue-button"
+          className="get-started-button"
           onClick={onContinueShopping}
         >
           <ArrowLeft size={17} />
@@ -100,6 +98,7 @@ export default function CartItem({ onContinueShopping }) {
             {items.map((item) => (
               <article className="cart-item" key={item.id}>
                 <img
+                  className="cart-item-image"
                   src={item.image}
                   alt={item.name}
                 />
@@ -109,9 +108,13 @@ export default function CartItem({ onContinueShopping }) {
                     {item.category}
                   </span>
 
-                  <h3>{item.name}</h3>
+                  <h3 className="cart-item-name">
+                    {item.name}
+                  </h3>
 
-                  <p>₹{item.price} each</p>
+                  <p className="cart-item-price">
+                    ₹{item.cost} each
+                  </p>
 
                   <div className="quantity-controls">
                     <button
@@ -134,16 +137,16 @@ export default function CartItem({ onContinueShopping }) {
 
                 <div className="cart-row-end">
                   <strong>
-                    ₹{item.price * item.quantity}
+                    ₹{item.cost * item.quantity}
                   </strong>
 
                   <button
                     className="remove-button"
                     onClick={() => handleRemove(item)}
-                    aria-label={`Remove ${item.name}`}
+                    aria-label={`Delete ${item.name}`}
                   >
                     <Trash2 size={17} />
-                    Remove
+                    Delete
                   </button>
                 </div>
               </article>
@@ -169,7 +172,7 @@ export default function CartItem({ onContinueShopping }) {
             </div>
 
             <button
-              className="checkout-button"
+              className="get-started-button1"
               onClick={handleCheckout}
             >
               Proceed to Checkout
